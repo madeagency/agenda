@@ -24,8 +24,9 @@ function clearJobs(done) {
 var jobTimeout = process.env.TRAVIS ? 1500 : 300;
 
 
-var jobType       = 'do work';
-var jobProcessor  = function(job) { };
+var jobType             = 'do work';
+var jobProcessor        = function(job) { };
+var genericJobProcessor = function(job, data) { };
 
 
 function failOnError(err) {
@@ -51,6 +52,7 @@ describe("agenda", function() {
             jobs.define('send email', jobProcessor);
             jobs.define('some job', jobProcessor);
             jobs.define(jobType, jobProcessor);
+            jobs.define(/generic:./, jobProcessor);
             done();
           });
         }, 50);
@@ -214,6 +216,9 @@ describe("agenda", function() {
         it('takes concurrency option for the job', function() {
           jobs.define('highPriority', {priority: 10}, jobProcessor);
           expect(jobs._definitions.highPriority).to.have.property('priority', 10);
+        });
+        it('stores a generic job', function() {
+          expect(jobs._definitions[/generic:*/]).to.have.property('fn', jobProcessor);
         });
       });
 
@@ -1476,6 +1481,15 @@ describe("agenda", function() {
       jobs.now('a job');
 
       jobs.start();
+    });
+  });
+
+  describe('generic tests', function () {
+    it('generic name matches regex', function () {
+      expect(jobs.every('5 minutes', 'generic:1', { 'what': 'yes' })).to.have.property('fn', genericJobProcessor);
+    });
+    it('generic names matching regex', function () {
+      expect(jobs.every('5 minutes', ['generic:1', 'generic:2', 'generic:3'])).to.be.an('array');
     });
   });
 
