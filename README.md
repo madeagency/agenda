@@ -313,6 +313,10 @@ Defines a job with the name of `jobName`. When a job of `jobName` gets run, it
 will be passed to `fn(job, done)`. To maintain asynchronous behavior, you must
 call `done()` when you are processing the job. If your function is synchronous,
 you may omit `done` from the signature.
+If the `jobName` starts and ends with a forward slash, agenda will define
+a generic job. 
+Generic jobs can be used to schedule multiple jobs with the same functionality
+at varying intervals.
 
 `options` is an optional argument which can overwrite the defaults. It can take
 the following:
@@ -352,6 +356,13 @@ Sync Job:
 ```js
 agenda.define('say hello', function(job) {
   console.log("Hello!");
+});
+```
+
+Generic Job:
+```js
+agenda.define('/cat:./', function(job) {
+  console.log(job.attrs.data, 'cat data');
 });
 ```
 
@@ -424,6 +435,17 @@ agenda.schedule('tomorrow at noon', ['printAnalyticsReport', 'sendNotifications'
 ```
 
 In this case, `schedule` returns array of `jobs`.
+
+```js
+agenda.define('/cat:./', function(job) {
+  console.log(job.attrs.data, 'cat data');
+});
+
+agenda.every('15 seconds', 'cat:1', { name: 'Garfield' });
+agenda.every('20 seconds', 'cat:2', { name: 'Mark' });
+agenda.every('15 seconds', 'cat:3', { name: 'Sarah' });
+agenda.every('5 seconds', 'cat:4', { name: 'Snowflake' });
+```
 
 ### now(name, [data], [cb])
 
