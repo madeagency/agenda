@@ -411,6 +411,19 @@ agenda.every('15 minutes', ['printAnalyticsReport', 'sendNotifications', 'update
 
 In this case, `every` returns array of `jobs`.
 
+To run generic jobs at given `intervals`
+
+```js
+agenda.define('/cat:./', function(job) {
+  console.log(job.attrs.data, 'cat data');
+});
+
+agenda.every('15 seconds', 'cat:1', { name: 'Garfield' });
+agenda.every('20 seconds', 'cat:2', { name: 'Mark' });
+agenda.every('15 seconds', 'cat:3', { name: 'Sarah' });
+agenda.every('5 seconds', 'cat:4', { name: 'Snowflake' });
+```
+
 ### schedule(when, name, [data], [cb])
 
 Schedules a job to run `name` once at a given time. `when` can be a `Date` or a
@@ -435,17 +448,6 @@ agenda.schedule('tomorrow at noon', ['printAnalyticsReport', 'sendNotifications'
 ```
 
 In this case, `schedule` returns array of `jobs`.
-
-```js
-agenda.define('/cat:./', function(job) {
-  console.log(job.attrs.data, 'cat data');
-});
-
-agenda.every('15 seconds', 'cat:1', { name: 'Garfield' });
-agenda.every('20 seconds', 'cat:2', { name: 'Mark' });
-agenda.every('15 seconds', 'cat:3', { name: 'Sarah' });
-agenda.every('5 seconds', 'cat:4', { name: 'Snowflake' });
-```
 
 ### now(name, [data], [cb])
 
